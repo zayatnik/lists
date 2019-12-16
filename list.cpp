@@ -32,7 +32,7 @@ public:
 			}
 			return T();
 		}
-		void operator++() {
+		void operator++(int) {
 			if (anode) {
 				anode = anode->anext;
 			}
@@ -43,8 +43,12 @@ public:
 public:
 	list();
 	~list();
-	void append(const T& t);
-	void remove();
+	void append_beg(const T& t);
+	void remove_beg();
+	void append(Node* prev,const T& t);
+	void append_end(const T& t);
+	void remove(Node* prev);
+	void remove_end();
 	Iterator begin() const;
 	Iterator end() const;
 	size_t size() const;
@@ -56,19 +60,66 @@ list< T >::list() : ahead(NULL) {
 }
 
 template < typename T >
-void list < T >::append(const T &t) {
+void list < T >::append_beg(const T &t) {
 	Node* node = new Node(t);
 	node->anext = ahead;
 	ahead = node;
 }
 
 template < typename T >
-void list < T >::remove() {
+void list < T >::append(Node* prev,const T& t) {
+	Node* a = new Node();
+	a->at = t;
+	a->anext = prev->anext;
+	prev->anext = a;
+}
+
+template < typename T >
+void list < T >::append_end(const T& t) {
+	if (ahead == NULL) {
+		append_beg(t);
+		return;
+	}
+	Node* a = ahead;
+	while (a->anext != NULL)
+		a = a->anext;
+	a->anext = new Node();
+	a->anext->at = t;
+	a->anext->anext = NULL;
+}
+
+template < typename T >
+void list < T >::remove_beg() {
 	if (ahead) {
 		Node* newHead = ahead->anext;
 		delete ahead;
 		ahead = newHead;
 	}
+}
+
+template < typename T >
+void list < T >::remove(Node* prev) {
+	if (prev->anext == NULL)
+		throw 1;
+	Node* a = prev->anext->anext;
+	delete prev->anext;
+	prev->anext = a;
+}
+
+template < typename T >
+void list < T >::remove_end() {
+	if (ahead == NULL)
+		throw 1;
+	if (ahead->anext == NULL) {
+		remove_beg();
+		return;
+	}
+	Node* a = ahead;
+	while (ahead->anext->anext != NULL)
+		ahead = ahead->anext;
+	delete ahead->next;
+	ahead->next = NULL;
+	ahead = a;
 }
 
 template < typename T >
